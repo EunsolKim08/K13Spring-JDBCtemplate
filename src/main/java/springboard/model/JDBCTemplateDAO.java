@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 /*
  JdbcTemplate 관련 주요 메소드
  Object queryForObject(String sql, RowMapper rm)
@@ -117,4 +118,107 @@ public class JDBCTemplateDAO {
 		
 		});
 	}
+	//게시물 조회수 증가
+	public void updateHit(final String idx) {
+		//쿼리문 작성
+		String sql = " UPDATE springboard SET "
+				+ " hits = hits+1 "
+				+ " WHERE idx = ? ";
+		
+		/*
+		 행의 변화를 주는 쿼리문 실행이므로 update 메서드를 사용한다.
+		 첫번째 인자는 쿼리문, 두번째 인자는 익명클래스를 통해 인파라미터를 설정한다.
+		 */
+		template.update(sql, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps ) throws
+			SQLException{
+				ps.setInt(1, Integer.parseInt(idx));
+			}
+		});
+	}
+	//게시물 상세보기
+	public SpringBbsDTO view(String idx) {
+		//조회수 증가 위한 메서드 호출
+		updateHit(idx);
+		
+		SpringBbsDTO dto = new SpringBbsDTO();
+		
+		String sql = " SELECT * FROM springboard "
+				+ " WHERE idx= " + idx;
+		try {
+			/*
+			 queryForObject() 메서드는 쿼리문을 실행한 후 반드시 하나의 결과를
+			 반환해야 한다. 그렇지 않으면 에러가 발생하게되므로 예외처리를 하는것이
+			 좋다.
+			 */
+			dto = template.queryForObject(sql, 
+					new BeanPropertyRowMapper<SpringBbsDTO>(
+							SpringBbsDTO.class));
+			/*
+			 BeanPropertyRwwMapper 클래스는 쿼리의 실행결과를 DTO에 저장해주는 역할을
+			 한다. 이때 테이블의 컬럼명과 DTO의 멤버변수명은 일치해야 한다.
+			 */
+		}
+		catch(Exception e) {
+			System.out.println("view()실행시 예외발생 ");
+		}
+		return dto;
+	}
+	
+	public int password(String idx, String pass) {
+		int retNum =0;
+		String sql = " SELECT * FROM springboard "
+				 +" WHERE pass='"+ pass+"' AND idx=" +idx;
+		try {
+			/*
+			 일련번호와 패스워드가 일치하는 게시물이 있는 경우 정상처리 되고,
+			 만약 일치하는 게시물이 없으면 예외가 발생한다.
+			 queryForObject()메서드는 반드시 하나의 결과가 나와야하고, 
+			 그렇지 못한 경우 예외를 발생시키기 때문이다.
+			 */
+			SpringBbsDTO dto = template.queryForObject(sql, 
+					new BeanPropertyRowMapper<SpringBbsDTO>(
+							SpringBbsDTO.class));
+			retNum = dto.getIdx();
+		}
+		catch(Exception e) {
+			System.out.println("password() 예외발생");
+		}
+		
+		return retNum;
+	}
+	
+	public void edit(final SpringBbsDTO dto) {
+		String sql = " UPDATE springboard "
+				+ " SET name=?, title=?, contents=? "
+				+ " WHERE idx=? AND pass=? ";
+		
+		template.update(sql, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException{
+				ps.setString(1, dto.getName());
+				ps.setString(2, dto.getTitle());
+				ps.setString(3, dto.getContents());
+				ps.setInt(4, dto.getIdx());
+				ps.setString(5, dto.getPass());
+			}
+		});
+	}
+	
+	public void delete(final String idx, final String pass) {
+		String sql = " DELETE FROM springboard "
+				+ " WHERE idx=? AND pass=?";
+		
+		template.update(sql, new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException{
+				ps.setString(1, idx);
+				ps.setString(2, pass);
+			}
+		});
+	}
+	
 }
