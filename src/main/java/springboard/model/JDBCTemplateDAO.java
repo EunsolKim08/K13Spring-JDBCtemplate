@@ -80,6 +80,34 @@ public class JDBCTemplateDAO {
 						new BeanPropertyRowMapper<SpringBbsDTO>(
 						SpringBbsDTO.class));
 	}
+	//리스트가져오기(페이징처리 O)
+	public ArrayList<SpringBbsDTO> listPage(
+			Map<String, Object> map){
+
+			int start = Integer.parseInt(map.get("start").toString());
+			int end = Integer.parseInt(map.get("end").toString());
+			
+			String sql = ""
+					+"SELECT * FROM ("
+					+"    SELECT Tb.*, rownum rNum FROM ("
+					+"        SELECT * FROM springboard ";				
+				if(map.get("Word")!=null){
+					sql +=" WHERE "+map.get("Column")+" "
+						+ " LIKE '%"+map.get("Word")+"%' ";				
+				}			
+				sql += " ORDER BY idx DESC"
+				+"    ) Tb"
+				+")"
+				+" WHERE rNum BETWEEN "+start+" and "+end;
+			
+			return (ArrayList<SpringBbsDTO>)
+				template.query(sql, 
+					new BeanPropertyRowMapper<SpringBbsDTO>(
+					SpringBbsDTO.class));
+	}
+
+
+
 	
 	//글쓰기 처리
 	public void write(final SpringBbsDTO springBbsDTO) {
@@ -220,5 +248,6 @@ public class JDBCTemplateDAO {
 			}
 		});
 	}
+	
 	
 }
