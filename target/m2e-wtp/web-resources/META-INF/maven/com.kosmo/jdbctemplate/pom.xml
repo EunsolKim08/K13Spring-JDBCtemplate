@@ -14,7 +14,7 @@
 		<org.slf4j-version>1.6.6</org.slf4j-version>
 	</properties>
 	<dependencies>
-		<!-- Spring -->
+		<!-- Spring --> 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -116,18 +116,19 @@
 			<version>4.7</version>
 			<scope>test</scope>
 		</dependency>
+		
 		<!-- JDBC설정을 위한 의존설정(오라클 드라이버) --> 
-		<dependency>  
-		<groupId>com.oracle</groupId>
-		<artifactId>ojdbc6</artifactId>
-		<version>11.2.0.3</version>
-	</dependency>
-	<!-- JDBC template을 위한 의존설정 -->
-	<dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-jdbc</artifactId>
-		<version>4.1.4.RELEASE</version>
-	</dependency>
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.3</version>
+		</dependency>
+		<!-- JDBC template을 위한 의존설정 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>4.1.4.RELEASE</version>
+		</dependency>
 		   
 	</dependencies>
     <build>
